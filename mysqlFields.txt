@@ -1,0 +1,16 @@
+MySQL Fields:
+id_str (string)
+created_at (string)
+//place (Place object)
+coordinates (list of floats)
+type (string (polygon or point))
+retweet_count (int)
+text (string)
+
+
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(200),
+   created_at TIMESTAMP,
+   retweet_count INT
+);
