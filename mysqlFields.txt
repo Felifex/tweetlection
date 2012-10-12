@@ -11,6 +11,21 @@ text (string)
 CREATE TABLE tweets (
    id VARCHAR(50) PRIMARY KEY,
    text VARCHAR(200),
-   created_at TIMESTAMP,
-   retweet_count INT
+   retweet_count INT,
+   created_at TIMESTAMP
 );
+
+conn = MySQLdb.connect(
+   host='localhost',
+   user='tweetlection',
+   passwd='tweetlection12',
+   db='tweetlection'
+)
+
+cursor = conn.cursor()
+cursor.execute("""
+   INSERT INTO tweets VALUES
+      (tweet.id_str, tweet.text, retweet_count, NULL);
+""")
+
+conn.close()
