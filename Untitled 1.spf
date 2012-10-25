@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ContentFilters</key>
+	<dict/>
+	<key>auto_connect</key>
+	<true/>
+	<key>data</key>
+	<dict>
+		<key>connection</key>
+		<dict>
+			<key>database</key>
+			<string>commentarization</string>
+			<key>host</key>
+			<string>localhost</string>
+			<key>kcid</key>
+			<string>-690819072616523386</string>
+			<key>name</key>
+			<string>Mac Pro</string>
+			<key>rdbms_type</key>
+			<string>mysql</string>
+			<key>sslCACertFileLocation</key>
+			<string></string>
+			<key>sslCACertFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslCertificateFileLocation</key>
+			<string></string>
+			<key>sslCertificateFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslKeyFileLocation</key>
+			<string></string>
+			<key>sslKeyFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>type</key>
+			<string>SPSocketConnection</string>
+			<key>useSSL</key>
+			<integer>0</integer>
+			<key>user</key>
+			<string>root</string>
+		</dict>
+		<key>session</key>
+		<dict>
+			<key>connectionEncoding</key>
+			<string>latin1</string>
+			<key>contentPageNumber</key>
+			<integer>1</integer>
+			<key>contentSortColIsAsc</key>
+			<true/>
+			<key>contentViewport</key>
+			<string>{{0, 0}, {1047, 649}}</string>
+			<key>isToolbarVisible</key>
+			<true/>
+			<key>queries</key>
+			<string>DROP TABLE IF EXISTS submissions CASCADE;
+DROP TABLE IF EXISTS comments CASCADE;
+
+CREATE TABLE submissions (
+   id VARCHAR(25) PRIMARY KEY,
+   subreddit_id VARCHAR(25),
+   title TEXT,
+   is_self BOOL,
+   selftext TEXT,
+   url TEXT,
+   ups INT,
+   downs INT,
+   score INT,
+   num_comments INT
+);
+
+CREATE TABLE comments (
+   id VARCHAR(25) PRIMARY KEY,
+   link_id VARCHAR(25) REFERENCES submission ON DELETE CASCADE,
+   is_root BOOL,
+   parent_id VARCHAR(25) DEFAULT NULL REFERENCES comment ON DELETE CASCADE,
+   ups INT,
+   downs INT,
+   score INT,
+   body TEXT
+);</string>
+			<key>view</key>
+			<string>SP_VIEW_CUSTOMQUERY</string>
+			<key>windowVerticalDividerPosition</key>
+			<real>206</real>
+		</dict>
+	</dict>
+	<key>encrypted</key>
+	<false/>
+	<key>format</key>
+	<string>connection</string>
+	<key>queryFavorites</key>
+	<array/>
+	<key>queryHistory</key>
+	<array>
+		<string>DROP TABLE IF EXISTS submissions CASCADE;
+DROP TABLE IF EXISTS comments CASCADE;
+CREATE TABLE submissions (
+   id VARCHAR(25) PRIMARY KEY,
+   subreddit_id VARCHAR(25),
+   title TEXT,
+   is_self BOOL,
+   selftext TEXT,
+   url TEXT,
+   ups INT,
+   downs INT,
+   score INT,
+   num_comments INT
+);
+CREATE TABLE comments (
+   id VARCHAR(25) PRIMARY KEY,
+   link_id VARCHAR(25) REFERENCES submission ON DELETE CASCADE,
+   is_root BOOL,
+   parent_id VARCHAR(25) DEFAULT NULL REFERENCES comment ON DELETE CASCADE,
+   ups INT,
+   downs INT,
+   score INT,
+   body TEXT
+)</string>
+		<string>DROP TABLE IF EXISTS submission CASCADE;
+DROP TABLE IF EXISTS comment CASCADE;
+CREATE TABLE submissions (
+   id VARCHAR(25) PRIMARY KEY,
+   subreddit_id VARCHAR(25),
+   title TEXT,
+   is_self BOOL,
+   selftext TEXT,
+   url TEXT,
+   ups INT,
+   downs INT,
+   score INT,
+   num_comments INT
+);
+CREATE TABLE comments (
+   id VARCHAR(25) PRIMARY KEY,
+   link_id VARCHAR(25) REFERENCES submission ON DELETE CASCADE,
+   is_root BOOL,
+   parent_id VARCHAR(25) DEFAULT NULL REFERENCES comment ON DELETE CASCADE,
+   ups INT,
+   downs INT,
+   score INT,
+   body TEXT
+)</string>
+		<string>DROP TABLE IF EXISTS submission CASCADE;
+DROP TABLE IF EXISTS comment CASCADE;
+CREATE TABLE submission (
+   id VARCHAR(25) PRIMARY KEY,
+   subreddit_id VARCHAR(25),
+   title TEXT,
+   is_self BOOL,
+   selftext TEXT,
+   url TEXT,
+   ups INT,
+   downs INT,
+   score INT,
+   num_comments INT
+);
+CREATE TABLE comment (
+   id VARCHAR(25) PRIMARY KEY,
+   link_id VARCHAR(25) REFERENCES submission ON DELETE CASCADE,
+   is_root BOOL,
+   parent_id VARCHAR(25) DEFAULT NULL REFERENCES comment ON DELETE CASCADE,
+   ups INT,
+   downs INT,
+   score INT,
+   body TEXT
+)</string>
+		<string>DROP TABLE IF EXISTS submission CASCADE;
+DROP TABLE IF EXISTS comment CASCADE;
+CREATE TABLE submission (
+   id VARCHAR(25) PRIMARY KEY,
+   subreddit_id VARCHAR(25),
+   title TEXT DEFAULT NULL,
+   is_self BOOL,
+   selftext TEXT DEFAULT NULL,
+   url TEXT,
+   ups INT,
+   downs INT,
+   score INT,
+   num_comments INT
+);
+CREATE TABLE comment (
+   id VARCHAR(25) PRIMARY KEY,
+   link_id VARCHAR(25) REFERENCES submission ON DELETE CASCADE,
+   is_root BOOL,
+   parent_id VARCHAR(25) DEFAULT NULL REFERENCES comment ON DELETE CASCADE,
+   ups INT,
+   downs INT,
+   score INT,
+   body TEXT DEFAULT NULL
+)</string>
+		<string>DROP TABLE IF EXISTS submission CASCADE;
+DROP TABLE IF EXISTS comment CASCADE;
+CREATE TABLE submission (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   created_at TIMESTAMP
+);
+CREATE TABLE comment (
+   tweet VARCHAR(50) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   start_index INT,
+   end_index INT,
+   PRIMARY KEY (tweet, hashtag, start_index)
+)</string>
+		<string>/* DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   created_at TIMESTAMP
+); */
+
+DROP TABLE IF EXISTS test CASCADE;
+CREATE TABLE test (
+   FOREIGN KEY (tweet) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   start_index INT,
+   end_index INT,
+   PRIMARY KEY (hashtag, start_index)
+)</string>
+		<string>/* DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   created_at TIMESTAMP
+); */
+
+DROP TABLE IF EXISTS test CASCADE;
+CREATE TABLE test (
+   FOREIGN KEY (tweet) VARCHAR(50) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   start_index INT,
+   end_index INT,
+   PRIMARY KEY (hashtag, start_index)
+)</string>
+		<string>/* DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   created_at TIMESTAMP
+); */
+
+DROP TABLE IF EXISTS test CASCADE;
+CREATE TABLE test (
+   FOREIGN KEY tweet VARCHAR(50) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   start_index INT,
+   end_index INT,
+   PRIMARY KEY (hashtag, start_index)
+)</string>
+		<string>/* DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   created_at TIMESTAMP
+); */
+
+DROP TABLE IF EXISTS test CASCADE;
+CREATE TABLE test (
+   tweet VARCHAR(50) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   start_index INT,
+   end_index INT,
+   FOREIGN KEY (tweet),
+   PRIMARY KEY (tweet, hashtag, start_index)
+)</string>
+		<string>/* DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   created_at TIMESTAMP
+); */
+
+DTOP TABLE IF EXISTS test CASCADE</string>
+		<string>/* DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   created_at TIMESTAMP
+); */
+
+CREATE TABLE test (
+   tweet VARCHAR(50) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   start_index INT,
+   end_index INT,
+   PRIMARY KEY (tweet, hashtag, start_index)
+)</string>
+		<string>DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   created_at TIMESTAMP
+);
+CREATE TABLE entities (
+   tweet VARCHAR(50) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   start_index INT,
+   end_index INT,
+   PRIMARY KEY (tweet, hashtag, start_index)
+)</string>
+		<string>DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   created_at TIMESTAMP
+);
+CREATE TABLE entities (
+   tweet VARCHAR(50) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   start_index INT,
+   end_index INT,
+   PRIMARY KEY (tweet, hashtag)
+)</string>
+		<string>DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   created_at TIMESTAMP
+);
+CREATE TABLE entities (
+   tweet VARCHAR(50) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   count INT,
+   PRIMARY KEY (tweet, hashtag)
+)</string>
+		<string>DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   ents VARCHAR(50) REFERENCES entities ON DELETE CASCADE,
+   created_at TIMESTAMP
+);
+CREATE TABLE entities (
+   tweet VARCHAR(50) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   count INT,
+   PRIMARY KEY (tweet, hashtag)
+)</string>
+		<string>DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   ents VARCHAR(50) REFERENCES entities ON DELETE CASCADE,
+   created_at TIMESTAMP
+);
+CREATE TABLE entities (
+   tweet REFERENCES tweets,
+   hashtag VARCHAR(255),
+   count INT,
+   PRIMARY KEY (tweet, hashtag)
+)</string>
+		<string>DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   ents VARCHAR(50) REFERENCES entities ON DELETE CASCADE,
+   created_at TIMESTAMP
+);
+CREATE TABLE entities (
+   FOREIGN KEY (tweet) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   count INT,
+   PRIMARY KEY (tweet, hashtag)
+)</string>
+		<string>DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   ents VARCHAR(50) REFERENCES entities ON DELETE CASCADE,
+   created_at TIMESTAMP
+);
+CREATE TABLE entities (
+   tweet VARCHAR(50),
+   FOREIGN KEY (tweet) REFERENCES tweets,
+   hashtag VARCHAR(255),
+   count INT,
+   PRIMARY KEY (tweet, hashtag)
+)</string>
+		<string>DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   ents VARCHAR(50) REFERENCES entities ON DELETE CASCADE,
+   created_at TIMESTAMP
+);
+CREATE TABLE entities (
+   tweet VARCHAR(50),
+   FOREIGN KEY tweet REFERENCES tweets,
+   hashtag VARCHAR(255),
+   count INT,
+   PRIMARY KEY (tweet, hashtag)
+)</string>
+		<string>DROP TABLE IF EXISTS tweets CASCADE;
+DROP TABLE IF EXISTS entities CASCADE;
+CREATE TABLE tweets (
+   id VARCHAR(50) PRIMARY KEY,
+   text VARCHAR(255),
+   retweet_count INT,
+   ents VARCHAR(50) REFERENCES entities ON DELETE CASCADE,
+   created_at TIMESTAMP
+);
+CREATE TABLE entities (
+   FOREIGN KEY tweet REFERENCES tweets,
+   hashtag VARCHAR(255),
+   count INT,
+   PRIMARY KEY (tweet, hashtag)
+)</string>
+	</array>
+	<key>rdbms_type</key>
+	<string>mysql</string>
+	<key>rdbms_version</key>
+	<string>5.5.28</string>
+	<key>version</key>
+	<integer>1</integer>
+</dict>
+</plist>
