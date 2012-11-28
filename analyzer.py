@@ -14,18 +14,22 @@ def main():
 
    cursor = conn.cursor()
 
+   tweets = None;
    # Pull the first 100 tweets
    try:
       cursor.execute(
          "SELECT text, retweet_count FROM tweets "
-         "WHERE retweet_count > 100 AND text LIKE '%FUCK%' "
+         "WHERE retweet_count > 1000 "
          "GROUP BY text "
-         "HAVING max(retweet_count)")
+         "HAVING max(retweet_count) "
+         "ORDER BY retweet_count")
       tweets = cursor.fetchall()
       for tweet in tweets:
          print tweet
    except Exception, e:
       raise e
+
+
 
    if tweets:
       print len(tweets)
