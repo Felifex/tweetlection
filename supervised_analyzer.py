@@ -69,7 +69,7 @@ def romney_accuracy(labeled_tweets, class_type='nb'):
    for tweet in labeled_tweets:
       feature_set.extend(romney_tweet_features(tweet))
 
-   print 'Romney:'
+   print 'Romney:', len(feature_set), 'features'
    train_and_test(feature_set, class_type)
    
 def obama_accuracy(labeled_tweets, class_type='nb'):
@@ -77,7 +77,7 @@ def obama_accuracy(labeled_tweets, class_type='nb'):
    for tweet in labeled_tweets:
       feature_set.extend(obama_tweet_features(tweet))
 
-   print 'Obama:'
+   print 'Obama:', len(feature_set), 'features'
    train_and_test(feature_set, class_type)
 
 def train_and_test(feature_set, class_type='nb'):
