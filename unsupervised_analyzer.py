@@ -2,6 +2,9 @@ import sys, re, random
 import mysql.connector as mysql
 import nltk
 
+DEMOC = ['obama', 'biden', 'joe', 'barack', 'michelle']
+REPUB = ['romney', 'mitt', 'paul', 'ryan']
+
 def main():
     # Connect to the DB
     # host='24.205.232.5'
@@ -79,9 +82,28 @@ def get_total_average(sentdic, tweets):
     print '|                         |'
     print '\-------------------------/'
 
+def score_tweet(sentdic, tweet):
+    obama_sent = False
+    romney_sent = False
+    obama_score = -5
+    romney_score = -5
+
+    for word in tweet[0]:
+        if word in DEMOC:
+            obama_sent = True
+        if word in REPUB:
+            romney_sent = True
+
+    if obama_sent:
+        obama_score = rate_single_tweet(sentdic, tweet)
+    if romney_sent:
+        romney_score = rate_single_tweet(sentdic, tweet)
+
+    return (obama_score, romney_score)
+
 
 def rate_single_tweet(sentdic, tweet):
-    wordlist = nltk.word_tokenize(tweet[1])
+    wordlist = nltk.word_tokenize(tweet[0])
     sum = 0
     count = 0
     for word in wordlist:
@@ -97,6 +119,7 @@ def rate_single_tweet(sentdic, tweet):
     return average
 
 def make_dic():
+    print 'Loading Sentiment Corpus\n'
     #open and read word library
     f = open('sent.csv')
     f = f.readlines()
@@ -118,55 +141,3 @@ def make_dic():
         word_dict[fields[0]] = (happiness, stddev)
 
     return word_dict
-
-
-def get_labeled_tweets():
-    # Open File
-    f = open('labeled_tweets.csv')
-    f = f.readlines()
-    
-    tweets = []
-    for index, tweet in enumerate(f):
-        labeled_tweet = {}
-        tweet = tweet.strip()
-        fields = tweet.split(',')        
-        if len(fields) < 5:
-            # print index, 'SKIP: < 5'
-            continue
-        
-        # Join fields that have commas in text
-        if len(fields) > 5:
-            temp_fields = []
-            temp_fields.append(fields[0])
-            combine = len(fields) - 4
-            temp_fields.append(', '.join(fields[1:1+combine]))
-            temp_fields.extend(fields[1+combine:])
-            fields = temp_fields
-        
-        if not (fields[0].isdigit() and fields[2].isdigit()):
-            # print index, 'SKIP: Bad format'
-            continue
-        
-        labeled_tweet['text'] = fields[1].lower()
-        labeled_tweet['retweets'] = int(fields[2])
-        
-        try:
-            labeled_tweet['obama'] = int(fields[3])
-        except Exception, e:
-            pass
-        
-        try:
-            labeled_tweet['romney'] = int(fields[4])
-        except Exception, e:
-            pass
-        
-        if not 'obama' in labeled_tweet and not 'romney' in labeled_tweet:
-            # print index, 'SKIP: No data'
-            continue
-        
-        tweets.append(labeled_tweet)
-    
-    return tweets
-
-if __name__ == '__main__':
-    sys.exit(main())

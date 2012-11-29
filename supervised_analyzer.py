@@ -1,3 +1,5 @@
+import unsupervised_analyzer as unsupervised
+
 import sys, re, random
 import mysql.connector as mysql
 import nltk
@@ -7,14 +9,14 @@ STOPWORDS = ['...']
 def main():
    # Connect to the DB
    # host='24.205.232.5'
-   conn = mysql.connect(
-      host='127.0.0.1',
-      user='tweetlection',
-      passwd='tweetlection12',
-      db='tweetlection'
-   )
+   # conn = mysql.connect(
+   #    host='127.0.0.1',
+   #    user='tweetlection',
+   #    passwd='tweetlection12',
+   #    db='tweetlection'
+   # )
 
-   cursor = conn.cursor()
+   # cursor = conn.cursor()
 
    # Parse Labeled Tweets
    labeled_tweets = get_labeled_tweets()
@@ -26,22 +28,44 @@ def main():
    # Get both classifiers for Obama and Romney
    (romney_classifier, obama_classifier) = get_trained_classifiers(labeled_tweets)
 
-   tweets = None;
-   # Pull the first 100 tweets
-   try:
-      cursor.execute(
-         "SELECT text, retweet_count FROM tweets "
-         "GROUP BY text "
-         "HAVING max(retweet_count) "
-         "ORDER BY retweet_count")
-      tweets = cursor.fetchall()
-   except Exception, e:
-      print e.message
-      raise e
+   # Get Sentiment Dictionary
+   sentiment_dict = unsupervised.make_dic()
 
-   if tweets:
-      print 'Classifying', len(tweets), 'unlabeled Tweets:'
-      generate_overall_score(tweets, obama_classifier, romney_classifier)
+   interactive_demo(obama_classifier, romney_classifier, sentiment_dict)
+
+   # tweets = None;
+   # # Pull the first 100 tweets
+   # try:
+   #    cursor.execute(
+   #       "SELECT text, retweet_count FROM tweets "
+   #       "GROUP BY text "
+   #       "HAVING max(retweet_count) "
+   #       "ORDER BY retweet_count")
+   #    tweets = cursor.fetchall()
+   # except Exception, e:
+   #    print e.message
+   #    raise e
+
+   # if tweets:
+   #    print 'Classifying', len(tweets), 'unlabeled Tweets:'
+   #    generate_overall_score(tweets, obama_classifier, romney_classifier)
+
+def interactive_demo(obama_classifier, romney_classifier, sentiment_dict):
+   while True:
+      print 'Please Enter a Tweet:'
+      tweet_text = raw_input()
+
+      tweet = [tweet_text, 1]
+
+      print '\nSupervised Results:'
+      (obama, romney) = obama_romney_score(tweet, obama_classifier, romney_classifier)
+      print_results(obama, romney)
+      print
+
+      print 'Unsupervised Results:'
+      (obama, romney) = unsupervised.score_tweet(sentiment_dict, tweet)
+      print_results(obama, romney)
+      print
 
 def generate_overall_score(tweets, obama_classifier, romney_classifier):
    obama_score = 0
@@ -57,27 +81,40 @@ def generate_overall_score(tweets, obama_classifier, romney_classifier):
    obama_score /= total_tweets
    romney_score /= total_tweets
 
+   print_results(obama_score, romney_score)
+   
+def print_results(obama_score, romney_score):
    print '/--------------------------\\'
    print '|                          |'
-   print '| Obama Sentiment:', "%.3f" % obama_score, ' |'
-   print '| Romney Sentiment:', "%.3f" % romney_score, '|'
+   if obama_score == -5:
+      print '| No sentiment matches.    |'
+   else:
+      print '| Obama Sentiment:', "%.3f" % obama_score, ' |'
+   if romney_score == -5:
+      print '| No sentiment matches.    |'
+   else:
+      print '| Romney Sentiment:', "%.3f" % romney_score, '|'
    print '|                          |'
    print '\--------------------------/'
-   
 
 def obama_romney_score(tweet, obama_classifier, romney_classifier):
-   formatted_tweet = {'text': tweet[0],
+   formatted_tweet = {'text': tweet[0].lower(),
                       'retweets': tweet[1]}
 
    obama_features = obama_tweet_features(formatted_tweet, labeled=False)
    romney_features = romney_tweet_features(formatted_tweet, labeled=False)
 
-   return (get_tweet_score(obama_features, obama_classifier), get_tweet_score(romney_features, romney_classifier))
+   print 'Obama Sentiment Breakdown:'
+   o_score = get_tweet_score(obama_features, obama_classifier)
+   print 'Romney Sentiment Breakdown:'
+   r_score = get_tweet_score(romney_features, romney_classifier)
 
+   return (o_score, r_score)
 
 def get_tweet_score(features, classifier):
    tweet_score = 0
    for feature in features:
+      print '\tWord:', feature['word'], '-', classifier.classify(feature)
       tweet_score += get_score(classifier.classify(feature))
    tweet_score = float(tweet_score) / len(features)
    return tweet_score
