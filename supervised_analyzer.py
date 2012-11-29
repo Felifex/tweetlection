@@ -18,8 +18,8 @@ def main():
    labeled_tweets = get_labeled_tweets()
 
    # Get Accuracy
-   romney_accuracy(labeled_tweets, class_type='dt')
-   obama_accuracy(labeled_tweets, class_type='dt')
+   romney_accuracy(labeled_tweets, class_type='nb')
+   obama_accuracy(labeled_tweets, class_type='nb')
 
    # tweets = None;
    # # Pull the first 100 tweets
@@ -70,7 +70,6 @@ def train_and_test(feature_set, class_type='nb'):
 
    # Split features
    midpoint = len(feature_set) / 2
-   print midpoint
    train, test = feature_set[:midpoint], feature_set [midpoint:]
 
    if class_type == 'nb':
@@ -78,14 +77,15 @@ def train_and_test(feature_set, class_type='nb'):
       classifier = nltk.NaiveBayesClassifier.train(train)
    elif class_type == 'dt':
       classifier = nltk.DecisionTreeClassifier.train(train)
-   # elif class_type = 'me':
-   #    classifier = nltk.MaxentClassifier.train(train)
+   elif class_type == 'svm':
+      classifier = nltk.SklearnClassifier.train(train)
 
    # Test classifier
    print 'Accuracy:', nltk.classify.accuracy(classifier, test)
 
    # Print most important features
-   classifier.show_most_informative_features(20)
+   if class_type == 'nb':
+      classifier.show_most_informative_features(20)
 
 def romney_tweet_features(tweet):
    word_features = []
@@ -93,8 +93,7 @@ def romney_tweet_features(tweet):
    word_list = nltk.word_tokenize(tweet['text'])
    for x in range(0, tweet['retweets']):
       for word in word_list:
-         if len(word) >= 3:
-            if 'romney' in tweet:
+         if len(word) >= 3 and 'romney' in tweet:
                word_features.append(({'word': word}, get_score_string(tweet['romney'])))
 
    return word_features
@@ -105,8 +104,7 @@ def obama_tweet_features(tweet):
    word_list = nltk.word_tokenize(tweet['text'])
    for x in range(0, tweet['retweets']):
       for word in word_list:
-         if len(word) >= 3:
-            if 'obama' in tweet:
+         if len(word) >= 3 and 'obama' in tweet:
                word_features.append(({'word': word}, get_score_string(tweet['obama'])))
 
    return word_features
