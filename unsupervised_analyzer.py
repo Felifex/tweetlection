@@ -88,7 +88,9 @@ def score_tweet(sentdic, tweet):
     obama_score = -5
     romney_score = -5
 
-    for word in tweet[0]:
+    word_list = nltk.word_tokenize(tweet[0])
+    for word in word_list:
+        word = word.strip('.,:; ').lower()
         if word in DEMOC:
             obama_sent = True
         if word in REPUB:
@@ -107,13 +109,13 @@ def rate_single_tweet(sentdic, tweet):
     sum = 0
     count = 0
     for word in wordlist:
-        word = word.strip('.,:;')
+        word = word.strip('.,:; ').lower()
         (happiness, stddev) = sentdic.get(word, (0, 0))
         if happiness > 0:
             sum += happiness
             count += 1
     if count != 0:
-        average = sum / count
+        average = float(sum) / count
     #normalize from 0-10 to (-1)-1
     average = (average / 5) - 1
     return average
