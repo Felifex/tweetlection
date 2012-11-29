@@ -20,29 +20,54 @@ def main():
    labeled_tweets = get_labeled_tweets()
 
    # Get Accuracy
-   romney_accuracy(labeled_tweets, class_type='nb')
-   obama_accuracy(labeled_tweets, class_type='nb')
+   # romney_accuracy(labeled_tweets, class_type='nb')
+   # obama_accuracy(labeled_tweets, class_type='nb')
 
-   # # Get both classifiers for Obama and Romney
-   # (romney_classifier, obama_classifier) = get_trained_classifiers(labeled_tweets)
+   # Get both classifiers for Obama and Romney
+   (romney_classifier, obama_classifier) = get_trained_classifiers(labeled_tweets)
 
-   # tweets = None;
-   # # Pull the first 100 tweets
-   # try:
-   #    cursor.execute(
-   #       "SELECT text, retweet_count FROM tweets "
-   #       "WHERE retweet_count > 10000 "
-   #       "GROUP BY text "
-   #       "HAVING max(retweet_count) "
-   #       "ORDER BY retweet_count")
-   #    tweets = cursor.fetchall()
-   # except Exception, e:
-   #    raise e
+   tweets = None;
+   # Pull the first 100 tweets
+   try:
+      # cursor.execute(
+      #    "SELECT text, retweet_count FROM tweets "
+      #    "WHERE retweet_count > 2500 "
+      #    "GROUP BY text "
+      #    "HAVING max(retweet_count) "
+      #    "ORDER BY retweet_count")
+      cursor.execute(
+         "SELECT text, 1 FROM tweets "
+         "WHERE retweet_count > 2000 ")
+      tweets = cursor.fetchall()
+   except Exception, e:
+      print e.message
+      raise e
 
-   # if tweets:
-   #    print len(tweets)
-   #    print tweets[0]
-   #    print obama_romney_score(tweets[0], obama_classifier, romney_classifier)
+   if tweets:
+      print 'Classifying', len(tweets), 'unlabeled Tweets:'
+      generate_overall_score(tweets, obama_classifier, romney_classifier)
+
+def generate_overall_score(tweets, obama_classifier, romney_classifier):
+   obama_score = 0
+   romney_score = 0
+   total_tweets = 0
+
+   for tweet in tweets:
+      (o, r) = obama_romney_score(tweet, obama_classifier, romney_classifier)
+      obama_score += o * tweet[1]
+      romney_score += r * tweet[1]
+      total_tweets += tweet[1]
+
+   obama_score /= total_tweets
+   romney_score /= total_tweets
+
+   print '/--------------------------\\'
+   print '|                          |'
+   print '| Obama Sentiment:', "%.3f" % obama_score, ' |'
+   print '| Romney Sentiment:', "%.3f" % romney_score, '|'
+   print '|                          |'
+   print '\--------------------------/'
+   
 
 def obama_romney_score(tweet, obama_classifier, romney_classifier):
    formatted_tweet = {'text': tweet[0],
@@ -68,6 +93,9 @@ def get_trained_classifiers(labeled_tweets):
       romney_feature_set.extend(romney_tweet_features(tweet))
       obama_feature_set.extend(obama_tweet_features(tweet))
 
+   print 'Training on', len(labeled_tweets), 'tweets'
+   print 'Found', len(obama_feature_set), 'features from Obama'
+   print 'Found', len(romney_feature_set), 'features from Romney\n'
    romney_classifier = nltk.NaiveBayesClassifier.train(romney_feature_set)
    obama_classifier = nltk.NaiveBayesClassifier.train(obama_feature_set)
    return (romney_classifier, obama_classifier)
@@ -91,7 +119,6 @@ def obama_accuracy(labeled_tweets, class_type='nb'):
 def train_and_test(feature_set, class_type='nb'):
    # Randomize
    random.shuffle(feature_set)
-   print feature_set[0]
 
    # Split features
    midpoint = len(feature_set) / 2
