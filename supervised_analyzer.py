@@ -29,15 +29,11 @@ def main():
    tweets = None;
    # Pull the first 100 tweets
    try:
-      # cursor.execute(
-      #    "SELECT text, retweet_count FROM tweets "
-      #    "WHERE retweet_count > 2500 "
-      #    "GROUP BY text "
-      #    "HAVING max(retweet_count) "
-      #    "ORDER BY retweet_count")
       cursor.execute(
-         "SELECT text, 1 FROM tweets "
-         "WHERE retweet_count > 2000 ")
+         "SELECT text, retweet_count FROM tweets "
+         "GROUP BY text "
+         "HAVING max(retweet_count) "
+         "ORDER BY retweet_count")
       tweets = cursor.fetchall()
    except Exception, e:
       print e.message

@@ -15,23 +15,24 @@ def main():
     cursor = conn.cursor()
     cursor.execute(
        "SELECT text, retweet_count FROM tweets "
-       "WHERE retweet_count > 2500 "
        "GROUP BY text "
        "HAVING max(retweet_count) "
        "ORDER BY retweet_count")
     tweets = cursor.fetchall()
 
     if tweets:
-        print len(tweets)
+        print 'Classifying', len(tweets), 'unlabeled Tweets:'
     sentdic = make_dic()
   
-    print get_total_average(sentdic, tweets)
+    get_total_average(sentdic, tweets)
             
             
 def get_total_average(sentdic, tweets):
     #grab a tweet and analize it using dictionary
-    obama_average = 0.0
-    romney_average = 0.0
+    obama_average = 0
+    obama_count = 0
+    romney_average = 0
+    romney_count = 0
     for tweet in tweets:
         wordlist = nltk.word_tokenize(tweet[0])
         average = 0.0
@@ -39,14 +40,12 @@ def get_total_average(sentdic, tweets):
         count = 0
         contains_obama = False
         contains_romney = False
-        print tweet[0]
-        print sentdic
+
         for word in wordlist:
             word = word.strip('.,:; ')
             word = word.lower()
             (happiness, stddev) = sentdic.get(word, (0, 0))
             if happiness > 0:
-                print 'asdfaksldhfkasdjf'
                 sum += happiness
                 count += 1
             if word == 'obama' or word == 'biden' or word == 'barack':
@@ -54,8 +53,6 @@ def get_total_average(sentdic, tweets):
             if word == 'romney' or word == 'ryan' or word == 'mitt':
                 contains_romney = True
 
-                
-        print sum, count
         if count != 0:
             average = float(sum) / float(count)
         
@@ -67,10 +64,21 @@ def get_total_average(sentdic, tweets):
 
         if contains_obama:
             obama_average += average
+            obama_count += 1
         if contains_romney:
             romney_average += average
-        break
-    return (obama_average, romney_average)
+            romney_count += 1
+
+    obama_val = obama_average/obama_count
+    romney_val = romney_average/romney_count
+
+    print '/-------------------------\\'
+    print '|                         |'
+    print '| Obama Sentiment:', "%.3f" % obama_val, ' |'
+    print '| Romney Sentiment:', "%.3f" % romney_val, '|'
+    print '|                         |'
+    print '\-------------------------/'
+
 
 def rate_single_tweet(sentdic, tweet):
     wordlist = nltk.word_tokenize(tweet[1])
@@ -90,13 +98,13 @@ def rate_single_tweet(sentdic, tweet):
 
 def make_dic():
     #open and read word library
-    f = open('word_sentiment.csv')
+    f = open('sent.csv')
     f = f.readlines()
     word_dict = {}
  
     for index, wordsent in enumerate(f):
         fields = wordsent.split(',')
-        print fields, '\n'
+
         try:
             happiness = float(fields[1])
         except Exception, e:
