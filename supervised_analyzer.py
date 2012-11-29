@@ -2,6 +2,8 @@ import sys, re, random
 import mysql.connector as mysql
 import nltk
 
+STOPWORDS = ['...']
+
 def main():
    # Connect to the DB
    # host='24.205.232.5'
@@ -18,44 +20,50 @@ def main():
    labeled_tweets = get_labeled_tweets()
 
    # Get Accuracy
-   # romney_accuracy(labeled_tweets, class_type='nb')
-   # obama_accuracy(labeled_tweets, class_type='nb')
+   romney_accuracy(labeled_tweets, class_type='nb')
+   obama_accuracy(labeled_tweets, class_type='nb')
 
-   # Get both classifiers for Obama and Romney
-   (romney_classifier, obama_classifier) = get_trained_classifiers(labeled_tweets)
-
-  
-   print romney_classifier.classify(romney_tweet_features(labeled_tweets[0]))
+   # # Get both classifiers for Obama and Romney
+   # (romney_classifier, obama_classifier) = get_trained_classifiers(labeled_tweets)
 
    # tweets = None;
    # # Pull the first 100 tweets
    # try:
-   #    insert_labeled_tweet = (
-   #       "INSERT INTO tweets (id, text, retweet_count) "
-   #       "VALUES (%s, %s, %s)")
-   #    tweet_data = (status.id_str, status.text, status.retweet_count)
-   #    self.cursor.execute(insert_tweet, tweet_data)
-
-   #    self.conn.commit() # Commit data
-
-
    #    cursor.execute(
    #       "SELECT text, retweet_count FROM tweets "
-   #       "WHERE retweet_count > 1000 "
+   #       "WHERE retweet_count > 10000 "
    #       "GROUP BY text "
    #       "HAVING max(retweet_count) "
    #       "ORDER BY retweet_count")
    #    tweets = cursor.fetchall()
-   #    for tweet in tweets:
-   #       print tweet
    # except Exception, e:
    #    raise e
 
    # if tweets:
    #    print len(tweets)
+   #    print tweets[0]
+   #    print obama_romney_score(tweets[0], obama_classifier, romney_classifier)
+
+def obama_romney_score(tweet, obama_classifier, romney_classifier):
+   formatted_tweet = {'text': tweet[0],
+                      'retweets': tweet[1]}
+
+   obama_features = obama_tweet_features(formatted_tweet, labeled=False)
+   romney_features = romney_tweet_features(formatted_tweet, labeled=False)
+
+   return (get_tweet_score(obama_features, obama_classifier), get_tweet_score(romney_features, romney_classifier))
+
+
+def get_tweet_score(features, classifier):
+   tweet_score = 0
+   for feature in features:
+      tweet_score += get_score(classifier.classify(feature))
+   tweet_score = float(tweet_score) / len(features)
+   return tweet_score
 
 def get_trained_classifiers(labeled_tweets):
-   romney_feature_set = [], obama_feature_set = []
+   romney_feature_set = []
+   obama_feature_set = []
    for tweet in labeled_tweets:
       romney_feature_set.extend(romney_tweet_features(tweet))
       obama_feature_set.extend(obama_tweet_features(tweet))
@@ -83,6 +91,7 @@ def obama_accuracy(labeled_tweets, class_type='nb'):
 def train_and_test(feature_set, class_type='nb'):
    # Randomize
    random.shuffle(feature_set)
+   print feature_set[0]
 
    # Split features
    midpoint = len(feature_set) / 2
@@ -103,25 +112,35 @@ def train_and_test(feature_set, class_type='nb'):
    if class_type == 'nb':
       classifier.show_most_informative_features(20)
 
-def romney_tweet_features(tweet):
+def romney_tweet_features(tweet, labeled=True):
    word_features = []
 
-   word_list = nltk.word_tokenize(tweet['text'])
-   for x in range(0, tweet['retweets']):
+   word_list = [w.strip('., ') for w in nltk.word_tokenize(tweet['text'])]
+   retweets = tweet['retweets'] if labeled else 1
+   for x in range(0, retweets):
       for word in word_list:
-         if len(word) >= 3 and 'romney' in tweet:
-               word_features.append(({'word': word}, get_score_string(tweet['romney'])))
+         if len(word) >= 3 and not word in STOPWORDS:
+            if labeled:
+               if 'romney' in tweet:
+                  word_features.append(({'word': word}, get_score_string(tweet['romney'])))
+            else:
+               word_features.append({'word': word})
 
    return word_features
 
-def obama_tweet_features(tweet):
+def obama_tweet_features(tweet, labeled=True):
    word_features = []
 
-   word_list = nltk.word_tokenize(tweet['text'])
-   for x in range(0, tweet['retweets']):
+   word_list = [w.strip('., ') for w in nltk.word_tokenize(tweet['text'])]
+   retweets = tweet['retweets'] if labeled else 1
+   for x in range(0, retweets):
       for word in word_list:
-         if len(word) >= 3 and 'obama' in tweet:
-               word_features.append(({'word': word}, get_score_string(tweet['obama'])))
+         if len(word) >= 3 and not word in STOPWORDS:
+            if labeled:
+               if 'obama' in tweet:
+                  word_features.append(({'word': word}, get_score_string(tweet['obama'])))
+            else:
+               word_features.append({'word': word})
 
    return word_features
 
@@ -133,6 +152,14 @@ def get_score_string(value):
       return 'neutral'
    else:
       return 'negative'
+
+def get_score(label):
+   if label == 'positive':
+      return 1
+   elif label == 'neutral':
+      return 0
+   else:
+      return -1
 
 def get_labeled_tweets():
    # Open File
