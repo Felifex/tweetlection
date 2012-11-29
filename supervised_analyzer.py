@@ -18,8 +18,14 @@ def main():
    labeled_tweets = get_labeled_tweets()
 
    # Get Accuracy
-   romney_accuracy(labeled_tweets, class_type='nb')
-   obama_accuracy(labeled_tweets, class_type='nb')
+   # romney_accuracy(labeled_tweets, class_type='nb')
+   # obama_accuracy(labeled_tweets, class_type='nb')
+
+   # Get both classifiers for Obama and Romney
+   (romney_classifier, obama_classifier) = get_trained_classifiers(labeled_tweets)
+
+  
+   print romney_classifier.classify(romney_tweet_features(labeled_tweets[0]))
 
    # tweets = None;
    # # Pull the first 100 tweets
@@ -47,6 +53,16 @@ def main():
 
    # if tweets:
    #    print len(tweets)
+
+def get_trained_classifiers(labeled_tweets):
+   romney_feature_set = [], obama_feature_set = []
+   for tweet in labeled_tweets:
+      romney_feature_set.extend(romney_tweet_features(tweet))
+      obama_feature_set.extend(obama_tweet_features(tweet))
+
+   romney_classifier = nltk.NaiveBayesClassifier.train(romney_feature_set)
+   obama_classifier = nltk.NaiveBayesClassifier.train(obama_feature_set)
+   return (romney_classifier, obama_classifier)
 
 def romney_accuracy(labeled_tweets, class_type='nb'):
    feature_set = []
